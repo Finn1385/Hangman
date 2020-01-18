@@ -1,0 +1,66 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+  background-color: whitesmoke;
+}
+
+img {
+  width: 17%;
+  height: 40%;
+  position: absolute;
+  left: 50%;
+  top: 15%;
+  transform: translateX(-50%);
+}
+
+.interaction {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+}
+.interaction .word {
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 70px;
+  color: black;
+}
+.interaction .keys {
+  text-align: center;
+}
+.interaction .key {
+  text-align: center;
+  font-size: 35px;
+  text-decoration: none;
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  border: 2px black solid;
+  border-radius: 5px;
+  color: black;
+  padding: 5px;
+  margin: 5px;
+  transition: 0.3s ease;
+  font-weight: bold;
+}
+.interaction .key:hover {
+  background-color: black;
+  color: white;
+}
+.interaction .guessed {
+  background-color: lightgray;
+  font-weight: normal;
+}
+.interaction .guessed:hover {
+  background-color: lightgray;
+  color: black;
+}
+
+/*# sourceMappingURL=style.css.map */
