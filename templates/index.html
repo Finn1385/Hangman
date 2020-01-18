@@ -2,10 +2,38 @@
 <html>
     <head>
         <title>
-            Hangman Game
+            The Hangman Game
         </title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css')}}">
     </head>
     <body>
-        <img src="{{ url_for('static', filename='Images/'+ imgWrong +'.png')}}">
+        {% if imgWrong > 0 %}
+            <img src="{{ url_for('static', filename='Images/'+ imgWrong | string +'.png')}}">
+        {% endif %}
+
+        <div class="interaction">
+            {% if win != False %}
+                <div class="word">{{ pword }}</div>
+            {% endif %}
+            
+            <div class="keys">
+                {% if win == False %}
+                    <h1 class="result">You lost!</h1>
+                    <h2>The word was <p class="word">{{ word }}</p></h2>
+                    <h2>To play again click <a href="{{ url_for('index') }}" class="reload">here</a>!</h2>
+                {% elif win == True%}
+                    <h1 class="result">You won!</h1>
+                    <h2>To play again click <a href="{{ url_for('index') }}" class="reload">here</a>!</h2>
+                {% else %}
+                    {% for letter in letters %}
+                        {% if letter not in guessed %}
+                            <a href="{{ url_for('guess', letter=letter) }}" class="key">{{ letter }}</a>
+                        {% else %}
+                            <div class="key guessed">{{ letter }}</div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
     </body>
 </html>
