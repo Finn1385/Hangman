@@ -1,4 +1,5 @@
 import random
+from flask import Flask, flash, redirect, url_for, render_template
 
 def getRandomWord():
     wordsPath = "./words.txt"
@@ -62,9 +63,14 @@ def start():
         print("")
         print("You lost! The word was: %s" % word)
 
-
-try:
-    start()
-except KeyboardInterrupt:
-    print("\nThanks for playing!")
     
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    word = getRandomWord()
+    return render_template("index.html", imgWrong="1")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
