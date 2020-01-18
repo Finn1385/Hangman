@@ -1,5 +1,5 @@
 import random
-from flask import Flask, flash, redirect, url_for, render_template
+from flask import Flask, flash, redirect, url_for, render_template, session
 
 def getRandomWord():
     wordsPath = "./words.txt"
@@ -65,12 +65,65 @@ def start():
 
     
 app = Flask(__name__)
+app.secret_key = "random"
+
+alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+
 
 @app.route("/")
 def index():
-    word = getRandomWord()
-    return render_template("index.html", imgWrong="1")
+    if("guessedLetters" in session):
+        word = session["guessingWord"]
+        guessed = session["guessedLetters"]
+        incorrect = session["incorrect"]
+        pword = ""
+        for c in word:
+            if(c in guessed):
+                pword += c
+            elif(c!=" "):
+                pword += "_"
+            pword += " "
+        if(session["incorrect"] == 7):
+            session.clear()
+            return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=False)
+        else:
+            if("_" not in pword):
+                session.clear()
+                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=True)
+            else:
+                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word)
 
+    else: #Start a new game
+        word = getRandomWord()
+        print(word)
+        pword = ""
+        for c in word:
+            if(c!=" "):
+                pword += "_"
+            pword += " "
+        session["guessingWord"] = word
+        session["incorrect"] = 0
+        return render_template("index.html", imgWrong=0, letters=alphabet, guessed=[], pword=pword, word=word)
+
+
+@app.route("/<letter>")
+def guess(letter):
+    if(letter != "favicon.ico"):
+        if(len(letter) > 1 or type(letter) != str or not letter.isalpha()):
+            return redirect(url_for("index"))
+        else:
+            if("guessedLetters" not in session):
+                session["guessedLetters"] = [letter]
+            else:
+                glList = session["guessedLetters"]
+                glList.append(letter)
+                session["guessedLetters"] = glList
+            if(letter not in session["guessingWord"]):
+                session["incorrect"] += 1
+            return redirect(url_for("index"))
+    return redirect(url_for(index))
+        
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
