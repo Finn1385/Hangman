@@ -72,6 +72,14 @@ alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n"
 
 @app.route("/")
 def index():
+    if("wins" not in session):
+        session["wins"] = 0
+    if("loses" not in session):
+        session["loses"] = 0
+
+    wins = session["wins"]
+    loses = session["loses"]
+
     if("guessedLetters" in session):
         word = session["guessingWord"]
         guessed = session["guessedLetters"]
@@ -85,13 +93,17 @@ def index():
             pword += " "
         if(session["incorrect"] == 7):
             session.clear()
-            return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=False)
+            session["loses"] = loses+1
+            session["wins"] = wins
+            return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=False, res=[wins, loses])
         else:
             if("_" not in pword):
                 session.clear()
-                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=True)
+                session["wins"] = wins+1
+                session["loses"] = loses
+                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=True, res=[wins, loses])
             else:
-                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word)
+                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, res=[wins, loses])
 
     else: #Start a new game
         word = getRandomWord()
@@ -103,7 +115,7 @@ def index():
             pword += " "
         session["guessingWord"] = word
         session["incorrect"] = 0
-        return render_template("index.html", imgWrong=0, letters=alphabet, guessed=[], pword=pword, word=word)
+        return render_template("index.html", imgWrong=0, letters=alphabet, guessed=[], pword=pword, word=word, res=[wins, loses])
 
 
 @app.route("/<letter>")

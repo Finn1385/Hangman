@@ -7,6 +7,9 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css')}}">
     </head>
     <body>
+        Wins: {{ res[0] }}
+        <br>
+        Loses: {{ res[1] }}
         {% if imgWrong > 0 %}
             <img src="{{ url_for('static', filename='Images/'+ imgWrong | string +'.png')}}">
         {% endif %}
