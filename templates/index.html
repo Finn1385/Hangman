@@ -10,6 +10,16 @@
         Wins: {{ res[0] }}
         <br>
         Loses: {{ res[1] }}
+        <div class="kbc">
+            <label for="kbdcheck">Allow keyboard guessing</label>
+            {% if kbd %}
+                <input type="checkbox" id="kbdcheck" checked>
+            {% else %}
+                <input type="checkbox" id="kbdcheck">
+            {% endif %}
+
+        </div>
+
         {% if imgWrong > 0 %}
             <img src="{{ url_for('static', filename='Images/'+ imgWrong | string +'.png')}}">
         {% endif %}
@@ -38,5 +48,24 @@
                 {% endif %}
             </div>
         </div>
+        <script>
+            const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+
+            document.addEventListener("keydown", function(event) {
+                keyboardCheck = document.getElementById("kbdcheck");
+                if(keyboardCheck.checked == true) {
+                    const key = event.key;
+                    if(alphabet.indexOf(key) >= 0) {
+                        window.location.href = "/" + key + "?kbd=true"
+                    }
+                }
+            })
+
+            if(document.getElementById("kbdcheck").checked == true) {
+                document.getElementById("kbdcheck").addEventListener("click", function(event) {
+                    window.location.href = "/-?kbd=false"
+                })
+            }
+        </script>
     </body>
 </html>

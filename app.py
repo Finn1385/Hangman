@@ -1,5 +1,5 @@
 import random
-from flask import Flask, flash, redirect, url_for, render_template, session
+from flask import Flask, flash, redirect, url_for, render_template, session, request
 
 def getRandomWord():
     wordsPath = "./words.txt"
@@ -80,6 +80,10 @@ def index():
     wins = session["wins"]
     loses = session["loses"]
 
+    if("kbd" not in session):
+        session["kbd"] = False
+    kbd = session["kbd"]
+
     if("guessedLetters" in session):
         word = session["guessingWord"]
         guessed = session["guessedLetters"]
@@ -92,22 +96,19 @@ def index():
                 pword += "_"
             pword += " "
         if(session["incorrect"] == 7):
-            session.clear()
+            clearSessionGame()
             session["loses"] = loses+1
-            session["wins"] = wins
-            return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=False, res=[wins, loses])
+            return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=False, res=[wins, loses], kbd=kbd)
         else:
             if("_" not in pword):
-                session.clear()
+                clearSessionGame()
                 session["wins"] = wins+1
-                session["loses"] = loses
-                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=True, res=[wins, loses])
+                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, win=True, res=[wins, loses], kbd=kbd)
             else:
-                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, res=[wins, loses])
+                return render_template("index.html", imgWrong=incorrect, letters=alphabet, guessed=guessed, pword=pword, word=word, res=[wins, loses], kbd=kbd)
 
     else: #Start a new game
         word = getRandomWord()
-        print(word)
         pword = ""
         for c in word:
             if(c!=" "):
@@ -115,12 +116,16 @@ def index():
             pword += " "
         session["guessingWord"] = word
         session["incorrect"] = 0
-        return render_template("index.html", imgWrong=0, letters=alphabet, guessed=[], pword=pword, word=word, res=[wins, loses])
+        return render_template("index.html", imgWrong=0, letters=alphabet, guessed=[], pword=pword, word=word, res=[wins, loses], kbd=kbd)
 
 
 @app.route("/<letter>")
 def guess(letter):
     if(letter != "favicon.ico"):
+        if(request.args.get("kbd") == "true"):
+            session["kbd"] = True
+        if(request.args.get("kbd") == "false"):
+            session["kbd"] = False
         if(len(letter) > 1 or type(letter) != str or not letter.isalpha()):
             return redirect(url_for("index"))
         else:
@@ -131,11 +136,16 @@ def guess(letter):
                 glList.append(letter)
                 session["guessedLetters"] = glList
             if(letter not in session["guessingWord"]):
-                session["incorrect"] += 1
+                if(session["guessedLetters"].count(letter) <= 1):
+                    session["incorrect"] += 1
             return redirect(url_for("index"))
     return redirect(url_for(index))
         
     
+def clearSessionGame():
+    session.pop("guessedLetters", None)
+    session.pop("guessingWord", None)
+    session.pop("incorrect", None)
 
 if __name__ == "__main__":
     app.run(debug=True)
